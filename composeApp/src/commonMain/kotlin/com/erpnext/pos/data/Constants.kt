@@ -1,4 +1,4 @@
-package com.erpnext.pos.localSource
+package com.erpnext.pos.data
 
 object Constants {
     const val DATABASE_NAME = "erpnext_pos"

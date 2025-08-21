@@ -29,7 +29,6 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
-            linkerOpts.add("-lsqlite3")
         }
     }
 
@@ -38,37 +37,6 @@ kotlin {
     sourceSets {
         val desktopMain by getting
 
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-
-
-            implementation(libs.kotlinx.coroutines.core)
-            /*implementation(libs.hilt.core)*/
-
-            implementation(libs.hilt.core)
-            implementation(libs.hilt)
-
-            implementation(libs.androidx.paging.common)
-
-            implementation(libs.androidx.core.ktx)
-
-            //Data Store
-            implementation("androidx.datastore:datastore-preferences:1.1.7")
-            implementation("androidx.datastore:datastore-core:1.1.7")
-
-            // Paging
-            implementation(libs.androidx.paging.compose)
-
-            implementation(libs.moshi.kotlin)
-            implementation(libs.moshi.adapters)
-
-            implementation(libs.androidx.room)
-            implementation(libs.androidx.room.coroutines)
-            implementation(libs.androidx.room.paging)
-
-            implementation(libs.androidx.room.sqlite.wrapper)
-        }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -82,14 +50,24 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation.compose)
 
-            implementation(libs.androidx.room)
+            // Room
+            implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
 
+            // Data Store: FIXME: Delete?
             implementation("androidx.datastore:datastore-preferences:1.1.7")
             implementation("androidx.datastore:datastore-core:1.1.7")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+        androidMain.dependencies {
+            implementation(compose.preview)
+            implementation(libs.androidx.activity.compose)
+
+            implementation(libs.kotlinx.coroutines.core)
+
+            implementation(libs.androidx.core.ktx)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -125,21 +103,6 @@ android {
     }
 }
 
-room {
-    schemaDirectory("$projectDir/schemas")
-}
-
-dependencies {
-    debugImplementation(compose.uiTooling)
-
-    add("kspAndroid", libs.hilt.compiler)
-
-    // Para metadata común (compartido en KMP)
-    add("kspAndroid", libs.androidx.room.compiler)
-    add("kspIosArm64", libs.androidx.room.compiler)
-    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
-}
-
 compose.desktop {
     application {
         mainClass = "com.erpnext.pos.MainKt"
@@ -150,4 +113,24 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+dependencies {
+    debugImplementation(compose.uiTooling)
+
+    listOf(
+        "kspAndroid",
+        "kspDesktop",
+
+        "kspIosX64",
+        "kspIosArm64",
+        "kspIosSimulatorArm64"
+    ).forEach {
+        add(it, libs.androidx.room.compiler)
+    }
+
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }

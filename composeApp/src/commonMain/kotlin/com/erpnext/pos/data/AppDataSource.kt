@@ -1,4 +1,4 @@
-package com.erpnext.pos.localSource
+package com.erpnext.pos.data
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -6,9 +6,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-class AppPreferences @Inject constructor(
+class AppPreferences constructor(
     private val dataStore: DataStore<Preferences>
 ) {
     private val AUTH_TOKEN = stringPreferencesKey("auth_token")
