@@ -2,7 +2,7 @@ package com.erpnext.pos.views.splash
 
 import androidx.lifecycle.viewModelScope
 import com.erpnext.pos.base.BaseViewModel
-import com.erpnext.pos.localSource.AppPreferences
+import com.erpnext.pos.data.AppPreferences
 import com.erpnext.pos.navigation.NavRoute
 import com.erpnext.pos.navigation.NavigationManager
 import com.erpnext.pos.utils.verifyAuthentication

@@ -3,7 +3,7 @@ package com.erpnext.pos.di
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.erpnext.pos.data.repositories.LoginRepositories
 import com.erpnext.pos.domain.usecases.LoginUseCase
-import com.erpnext.pos.localSource.AppPreferences
+import com.erpnext.pos.data.AppPreferences
 import com.erpnext.pos.localSource.datasources.LoginLocalSource
 import com.erpnext.pos.navigation.NavigationManager
 import com.erpnext.pos.remoteSource.api.APIService

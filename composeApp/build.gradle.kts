@@ -46,33 +46,13 @@ kotlin {
 
 
             implementation(libs.kotlinx.coroutines.core)
-            /*implementation(libs.hilt.core)*/
-
-            implementation(libs.hilt.core)
-            implementation(libs.hilt)
-
-            implementation(libs.androidx.paging.common)
-
             implementation(libs.androidx.core.ktx)
 
             //Data Store
             implementation("androidx.datastore:datastore-preferences:1.1.7")
             implementation("androidx.datastore:datastore-core:1.1.7")
 
-            // Paging
-            implementation(libs.androidx.paging.compose)
-
-            implementation(libs.moshi.kotlin)
-            implementation(libs.moshi.adapters)
-
-            implementation(libs.androidx.room)
-            implementation(libs.androidx.room.coroutines)
-            implementation(libs.androidx.room.paging)
-
-            //implementation(libs.androidx.room.sqlite.wrapper)
-
-            // Koin - DI
-            implementation("io.insert-koin:koin-android:3.5.3")
+            implementation(libs.androidx.room.sqlite.wrapper)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -87,19 +67,16 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation.compose)
 
-            api("androidx.datastore:datastore-preferences:1.1.7")
-            api("androidx.datastore:datastore-core:1.1.7")
-
-            implementation(libs.androidx.room)
+            implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
 
             implementation("io.insert-koin:koin-core:3.5.3")
             implementation("io.insert-koin:koin-androidx-compose:3.5.3")
 
             implementation("de.jensklingenberg.ktorfit:ktorfit-lib:2.6.4")
+
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
-
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
         }
         commonTest.dependencies {
@@ -146,12 +123,15 @@ room {
 dependencies {
     debugImplementation(compose.uiTooling)
 
-    add("kspAndroid", libs.hilt.compiler)
-
-    // Para metadata común (compartido en KMP)
-    add("kspAndroid", libs.androidx.room.compiler)
-    add("kspIosArm64", libs.androidx.room.compiler)
-    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    listOf(
+        "kspAndroid",
+        "kspDesktop",
+        "kspIosX64",
+        "kspIosArm64",
+        "kspIosSimulatorArm64"
+    ).forEach {
+        add(it, libs.androidx.room.compiler)
+    }
 }
 
 compose.desktop {

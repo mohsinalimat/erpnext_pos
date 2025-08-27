@@ -1,4 +1,4 @@
-package com.erpnext.pos.localSource
+package com.erpnext.pos.data
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
