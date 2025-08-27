@@ -4,8 +4,8 @@ import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
-import com.erpnext.pos.data.local.dao.UserDao
-import com.erpnext.pos.data.local.entities.UserEntity
+import com.erpnext.pos.localSource.dao.UserDao
+import com.erpnext.pos.localSource.entities.UserEntity
 
 @Database(
     entities = [

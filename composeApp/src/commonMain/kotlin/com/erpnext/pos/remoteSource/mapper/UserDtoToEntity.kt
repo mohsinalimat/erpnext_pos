@@ -6,8 +6,11 @@ import com.erpnext.pos.remoteSource.dto.UserDto
 fun UserDto.toEntity(): UserEntity {
     return UserEntity(
         name = this.name,
-        phone = this.phone,
+        firstName = this.firstName,
+        lastName = this.lastName,
+        username = this.username,
+        mobileNo = this.mobileNo,
         email = this.email,
-        isActive = this.isActive
+        enabled = this.enabled
     )
 }

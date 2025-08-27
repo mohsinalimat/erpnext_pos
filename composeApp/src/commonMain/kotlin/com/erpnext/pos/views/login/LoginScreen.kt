@@ -34,9 +34,10 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-@ExperimentalMaterial3Api
+@Preview
+@OptIn(ExperimentalMaterial3Api::class)
 fun LoginScreen(
-    state: LoginState, actins: LoginAction
+    state: LoginState, actions: LoginAction
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -111,7 +112,7 @@ fun LoginScreen(
             Button(
                 onClick = {
                     if (email.isNotEmpty() && password.isNotEmpty()) {
-                        actins.onLogin(email, password)
+                        actions.onLogin(email, password)
                     } else {
                         isError = true
                         errorMessage = "Credenciales Invalidas"
@@ -135,15 +136,4 @@ fun LoginScreen(
             }
         }
     }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-fun LoginPreview() {
-    LoginScreen(
-        state = LoginState.Loading,
-        actins = LoginAction()
-    )
 }

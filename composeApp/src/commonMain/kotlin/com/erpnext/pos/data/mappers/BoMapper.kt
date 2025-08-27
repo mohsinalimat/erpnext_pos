@@ -6,6 +6,6 @@ import com.erpnext.pos.remoteSource.dto.UserDto
 fun UserDto.toBO(): UserBO {
     return UserBO(
         name = this.name,
-        phone = this.phone
+        phone = this.mobileNo,
     )
 }

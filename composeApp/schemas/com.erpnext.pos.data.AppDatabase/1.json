@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "16c462edf5afa494e2a1e8c11d0940cc",
+    "identityHash": "7e1658b7c57fc51319366adf5ed88176",
     "entities": [
       {
         "tableName": "tabUser",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `firstName` TEXT NOT NULL, `lastName` TEXT, `username` TEXT, `email` TEXT NOT NULL, `mobileNo` TEXT, `salt` TEXT NOT NULL, `hash` TEXT NOT NULL, `deskTheme` TEXT NOT NULL, `enabled` INTEGER NOT NULL, PRIMARY KEY(`name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `firstName` TEXT NOT NULL, `lastName` TEXT, `username` TEXT, `email` TEXT NOT NULL, `mobileNo` TEXT, `deskTheme` TEXT NOT NULL, `enabled` INTEGER NOT NULL, PRIMARY KEY(`name`))",
         "fields": [
           {
             "fieldPath": "name",
@@ -42,18 +42,6 @@
             "affinity": "TEXT"
           },
           {
-            "fieldPath": "salt",
-            "columnName": "salt",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "hash",
-            "columnName": "hash",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "deskTheme",
             "columnName": "deskTheme",
             "affinity": "TEXT",
@@ -76,7 +64,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '16c462edf5afa494e2a1e8c11d0940cc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7e1658b7c57fc51319366adf5ed88176')"
     ]
   }
 }

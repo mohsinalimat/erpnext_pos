@@ -1,4 +1,4 @@
-package com.erpnext.pos.data.local.entities
+package com.erpnext.pos.localSource.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

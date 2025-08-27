@@ -14,6 +14,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.io.files.SystemFileSystem
+import okio.Path
 import okio.Path.Companion.toPath
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
@@ -21,18 +23,13 @@ import org.koin.dsl.module
 
 val appModule = module {
 
-    single {
-        HttpClient ()
-    }
-
-    // APIService manual
+    single { HttpClient () }
     single {
         APIService(
             client = get(),
             baseUrl = "https://erp-ni.distribuidorareyes.com/"
         )
     }
-
 
     single { LoginRemoteSource(get()) }
     single { LoginRepositories(get()) }
@@ -44,7 +41,7 @@ val appModule = module {
     single { SplashViewModel(get(), get()) }
     single {
         PreferenceDataStoreFactory.createWithPath {
-            "prefs.preferences_pb".toPath()
+            "./prefs.preferences_pb".toPath()
         }
     }
 }
