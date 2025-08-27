@@ -19,7 +19,8 @@ class LoginViewModel(
         executeUseCase(
             action = {
                 _stateFlow.update { LoginState.Loading }
-                useCase.execute(CredentialsDto(email, password))
+                val user = useCase(CredentialsDto(email, password)) // 👈 aquí
+
                 _stateFlow.update { LoginState.Success }
             },
             exceptionHandler = {

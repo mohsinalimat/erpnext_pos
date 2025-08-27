@@ -1,14 +1,22 @@
 package com.erpnext.pos.remoteSource.api
 
-import com.erpnext.pos.localSource.dao.UserDao
 import com.erpnext.pos.remoteSource.dto.CredentialsDto
 import com.erpnext.pos.remoteSource.dto.UserDto
-import de.jensklingenberg.ktorfit.http.Body
-import de.jensklingenberg.ktorfit.http.POST
-import io.ktor.http.cio.Response
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 
-interface APIService {
 
-    @POST("login")
-    suspend fun login(@Body() credentials: CredentialsDto) : UserDto
+class APIService(
+    private val client: HttpClient,
+    private val baseUrl: String
+) {
+
+    suspend fun login(credentials: CredentialsDto): UserDto {
+        return client.post("$baseUrl/login") {
+            contentType(ContentType.Application.Json)
+            setBody(credentials)
+        }.body()
+    }
 }

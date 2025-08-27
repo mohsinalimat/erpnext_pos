@@ -8,11 +8,9 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
-    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidx.room)
-
-    id("de.jensklingenberg.ktorfit") version "2.6.4"
 }
 
 kotlin {
@@ -31,7 +29,6 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
-            //linkerOpts.add("-lsqlite3")
         }
     }
 
@@ -40,20 +37,6 @@ kotlin {
     sourceSets {
         val desktopMain by getting
 
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-
-
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.androidx.core.ktx)
-
-            //Data Store
-            implementation("androidx.datastore:datastore-preferences:1.1.7")
-            implementation("androidx.datastore:datastore-core:1.1.7")
-
-            implementation(libs.androidx.room.sqlite.wrapper)
-        }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -63,6 +46,9 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
 
+            implementation(libs.androidx.datastore)
+            implementation(libs.androidx.datastore.preferences)
+
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation.compose)
@@ -70,21 +56,38 @@ kotlin {
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
 
-            implementation("io.insert-koin:koin-core:3.5.3")
-            implementation("io.insert-koin:koin-androidx-compose:3.5.3")
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.serialization.json)
 
-            implementation("de.jensklingenberg.ktorfit:ktorfit-lib:2.6.4")
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
 
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+            implementation(libs.koin.compose)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose.viewmodel)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+        androidMain.dependencies {
+            implementation(compose.preview)
+            implementation(libs.androidx.activity.compose)
+
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.androidx.core.ktx)
+
+            implementation(libs.koin.android)
+            implementation(libs.ktor.client.okhttp)
+            implementation(libs.kotlinx.coroutines.android)
+        }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutinesSwing)
+            implementation(libs.ktor.client.okhttp)
+            implementation(libs.kotlinx.coroutines.swing)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
     }
 }
@@ -126,7 +129,6 @@ dependencies {
     listOf(
         "kspAndroid",
         "kspDesktop",
-        "kspIosX64",
         "kspIosArm64",
         "kspIosSimulatorArm64"
     ).forEach {
