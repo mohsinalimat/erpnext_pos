@@ -3,7 +3,6 @@ package com.erpnext.pos
 import android.content.Context
 import com.erpnext.pos.remoteSource.oauth.TokenStore
 import com.erpnext.pos.remoteSource.oauth.TransientAuthStore
-import io.ktor.client.plugins.auth.providers.BearerTokens
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import androidx.security.crypto.EncryptedSharedPreferences
@@ -11,10 +10,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.withLock
 import androidx.core.content.edit
 import androidx.security.crypto.MasterKey
+import com.erpnext.pos.remoteSource.dto.TokenResponse
 
 class AndroidTokenStore(private val context: Context) : TokenStore, TransientAuthStore {
     private val mutex = Mutex()
-    private val stateFlow = MutableStateFlow<BearerTokens?>(null)
+    private val stateFlow = MutableStateFlow<TokenResponse?>(null)
 
     private val prefs by lazy {
         val keyGen = MasterKey.Builder(context)
@@ -31,19 +31,28 @@ class AndroidTokenStore(private val context: Context) : TokenStore, TransientAut
 
     private fun stringKey(key: String) = key
 
-    override suspend fun save(tokens: BearerTokens) = mutex.withLock {
+    override suspend fun save(tokens: TokenResponse) = mutex.withLock {
         prefs.edit().apply {
-            putString(stringKey("access_token"), tokens.accessToken)
-            putString(stringKey("refresh_token"), tokens.refreshToken)
+            putString(stringKey("access_token"), tokens.access_token)
+            putString(stringKey("refresh_token"), tokens.refresh_token)
+            putString(stringKey("id_token"), tokens.id_token)
+            putLong(stringKey("expires_in"), tokens.expires_in ?: 0L)
             apply()
         }
         stateFlow.value = tokens
     }
 
-    override suspend fun load(): BearerTokens? = mutex.withLock {
+    override suspend fun load(): TokenResponse? = mutex.withLock {
         val at = prefs.getString(stringKey("access_token"), null) ?: return null
         val rt = prefs.getString(stringKey("refresh_token"), null) ?: ""
-        val tokens = BearerTokens(at, rt)
+        val expires = prefs.getLong(stringKey("expires"), 0L)
+        val idToken = prefs.getString(stringKey("id_token"), null) ?: return null
+        val tokens = TokenResponse(
+            access_token = at,
+            refresh_token = rt,
+            expires_in = expires,
+            id_token = idToken
+        )
         stateFlow.value = tokens
         tokens
     }

@@ -1,6 +1,7 @@
 package com.erpnext.pos.di
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import com.erpnext.pos.BuildKonfig
 import com.erpnext.pos.data.repositories.LoginRepositories
 import com.erpnext.pos.domain.usecases.LoginUseCase
 import com.erpnext.pos.navigation.NavigationManager
@@ -27,11 +28,11 @@ val appModule = module {
 
     single {
         OAuthConfig(
-            baseUrl = "https://erp-ni.distribuidorareyes.com",
-            clientId = "7cg6tv3vov",
-            clientSecret = "a3625ee5aa",
-            redirectUrl = "oauth2redirect",
-            scopes = listOf("all")
+            baseUrl = BuildKonfig.BASE_URL,
+            clientId = BuildKonfig.CLIENT_ID,
+            clientSecret = BuildKonfig.CLIENT_SECRET,
+            redirectUrl = BuildKonfig.REDIRECT_URI,
+            scopes = listOf("all", "openid")
         )
     }
 

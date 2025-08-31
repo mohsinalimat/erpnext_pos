@@ -22,16 +22,28 @@ class APIService(
         .config {
             install(Auth) {
                 bearer {
-                    loadTokens { store.load() }
+                    loadTokens {
+                        val token = store.load()
+                        if (token != null)
+                            BearerTokens(token.access_token, token.refresh_token)
+                        null
+                    }
                     refreshTokens {
                         val current = store.load() ?: return@refreshTokens null
                         val refreshed =
-                            refreshToken(current.refreshToken ?: return@refreshTokens null)
+                            refreshToken(current.refresh_token ?: return@refreshTokens null)
                         val bearer = BearerTokens(
                             refreshed.access_token,
-                            refreshed.refresh_token ?: current.refreshToken
+                            refreshed.refresh_token ?: current.refresh_token
                         )
-                        store.save(bearer)
+                        store.save(
+                            TokenResponse(
+                                access_token = refreshed.access_token,
+                                refresh_token = refreshed.refresh_token,
+                                id_token = refreshed.id_token,
+                                expires_in = refreshed.expires_in
+                            )
+                        )
                         bearer
                     }
                 }
@@ -58,7 +70,8 @@ class APIService(
             }.formUrlEncode())
         }.body<TokenResponse>()
 
-        store.save(BearerTokens(res.access_token, res.refresh_token ?: ""))
+        store.save(res)
+        // store.save(BearerTokens(res.access_token, res.refresh_token ?: ""))
         return res
     }
 

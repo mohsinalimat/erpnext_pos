@@ -1,16 +1,19 @@
 package com.erpnext.pos
 
+import com.erpnext.pos.remoteSource.dto.TokenResponse
 import com.erpnext.pos.remoteSource.oauth.TokenStore
 import com.erpnext.pos.remoteSource.oauth.TransientAuthStore
+import kotlinx.cinterop.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import platform.Foundation.NSData
-import platform.Foundation.NSString
+import platform.CoreFoundation.kCFBooleanTrue
+import platform.Foundation.*
 import platform.Security.*
 import platform.darwin.*
 
+@OptIn(ExperimentalForeignApi::class)
 private fun keychainSet(key: String, value: String): Boolean {
     val data = value.cstr.getBytes()
     val query = mapOf(
@@ -24,6 +27,7 @@ private fun keychainSet(key: String, value: String): Boolean {
     return status == errSecSuccessL
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private fun keychainGet(key: String): String? {
     val query = mapOf(
         kSecClass to kSecClassGenericPassword,
@@ -44,6 +48,7 @@ private fun keychainGet(key: String): String? {
     return str
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private fun keychainDelete(key: String) {
     val query = mapOf(
         kSecClass to kSecClassGenericPassword,
@@ -54,24 +59,32 @@ private fun keychainDelete(key: String) {
 
 class IosTokenStore : TokenStore, TransientAuthStore {
     private val mutex = Mutex()
-    private val _flow = MutableStateFlow<BearerTokens?>(null)
+    private val _flow = MutableStateFlow<TokenResponse?>(null)
 
     private fun saveInternal(key: String, value: String) = keychainSet(key, value)
+    private fun saveInternal(key: String, value: Long) = keychainSet(key, value)
     private fun loadInternal(key: String) = keychainGet(key)
     private fun deleteInternal(key: String) = keychainDelete(key)
 
-    override suspend fun save(tokens: BearerTokens) = mutex.withLock {
-        saveInternal("access_token", tokens.accessToken)
-        saveInternal("refresh_token", tokens.refreshToken)
-        tokens.expiresAtEpochSeconds?.let { saveInternal("expires_at", it.toString()) }
+    override suspend fun save(tokens: TokenResponse) = mutex.withLock {
+        saveInternal("access_token", tokens.access_token)
+        saveInternal("refresh_token", tokens.refresh_token ?: "")
+        saveInternal("expires", tokens.expires_in ?: 0L)
+        saveInternal("id_token", tokens.id_token ?: "")
         _flow.value = tokens
     }
 
-    override suspend fun load(): BearerTokens? = mutex.withLock {
+    override suspend fun load(): TokenResponse? = mutex.withLock {
         val at = loadInternal("access_token") ?: return null
         val rt = loadInternal("refresh_token") ?: ""
-        val expires = loadInternal("expires_at")?.toLongOrNull()
-        val t = BearerTokens(at, rt, expires)
+        val expires = loadInternal("expires")?.toLongOrNull()
+        val idToken = loadInternal("id_token") ?: return null
+        val t = TokenResponse(
+            access_token = at,
+            refresh_token = rt,
+            expires_in = expires,
+            id_token = idToken
+        )
         _flow.value = t
         t
     }
@@ -85,8 +98,9 @@ class IosTokenStore : TokenStore, TransientAuthStore {
 
     override fun tokensFlow() = _flow.asStateFlow()
 
-    override suspend fun savePkceVerifier(verifier: String) =
+    override suspend fun savePkceVerifier(verifier: String) {
         saveInternal("pkce_verifier", verifier)
+    }
 
     override suspend fun loadPkceVerifier(): String? = loadInternal("pkce_verifier")
     override suspend fun clearPkceVerifier() = deleteInternal("pkce_verifier")

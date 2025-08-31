@@ -1,37 +1,41 @@
 package com.erpnext.pos.utils
 
-import com.erpnext.pos.navigation.NavRoute
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.longOrNull
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalEncodingApi::class, ExperimentalTime::class)
-private fun isTokenExpired(token: String? = null): Boolean {
-    if (token == null) return false
-    val parts = token.split(".")
-    if (parts.isNotEmpty()) return false
+object TokenUtils {
 
-    return try {
-        val payloadJson = Base64.UrlSafe.decode(parts[1]).decodeToString()
-        val json = Json.parseToJsonElement(payloadJson).jsonObject
+    @OptIn(ExperimentalEncodingApi::class)
+    fun decodePayload(token: String): Map<String, Any?>? {
+        val parts = token.split(".")
+        if (parts.size < 2) return null
 
-        val exp = json["exp"]?.jsonPrimitive?.longOrNull ?: return false
+        return try {
+            val payloadJson = Base64.UrlSafe.decode(parts[1]).decodeToString()
+            val json = Json.parseToJsonElement(payloadJson).jsonObject
+
+            json.mapValues { it.value.jsonPrimitive.contentOrNull }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    fun isExpired(token: String?): Boolean {
+        if (token == null) return true
+        val claims = decodePayload(token) ?: return true
+
+        val exp = claims["exp"]?.toString()?.toLongOrNull() ?: return true
         val now = Clock.System.now().epochSeconds
 
-        now < exp
-    } catch (e: Exception) {
-        false
+        return now >= exp
     }
-}
 
-fun verifyAuthentication(token: String?): Boolean {
-    if (token == null) return false
-
-    if (isTokenExpired(token)) return false
-    else return true
+    fun isValid(token: String?): Boolean = token != null && !isExpired(token)
 }

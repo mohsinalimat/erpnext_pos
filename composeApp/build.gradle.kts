@@ -1,6 +1,8 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import com.codingfeline.buildkonfig.gradle.TargetConfigDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -11,6 +13,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.build.konfig)
 }
 
 kotlin {
@@ -82,7 +85,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.coroutines.android)
 
-            implementation("androidx.security:security-crypto:1.1.0-alpha06")
+            implementation("androidx.security:security-crypto:1.1.0")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -91,6 +94,35 @@ kotlin {
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+        }
+    }
+}
+
+buildkonfig {
+    packageName = "com.erpnext.pos"
+
+    // default config is required
+    defaultConfigs {
+        buildConfigField(STRING, "BASE_URL", "BASE_URL")
+        buildConfigField(STRING, "CLIENT_ID", "CLIENT_ID")
+        buildConfigField(STRING, "CLIENT_SECRET", "CLIENT_SECRET")
+        buildConfigField(STRING, "REDIRECT_URI", "REDIRECT_URI")
+    }
+
+    targetConfigs { // dev target to pass BuildConfig to iOS
+        create("ios") {
+        }
+    }
+
+    targetConfigs("staging") {
+        create("android") {
+            buildConfigField(STRING, "BASE_URL", "https://erp-ni.distribuidorareyes.com")
+            buildConfigField(STRING, "CLIENT_ID", "7cg6tv3vov")
+            buildConfigField(STRING, "CLIENT_SECRET", "a3625ee5aa")
+            buildConfigField(STRING, "REDIRECT_URI", "org.erpnext.pos://oauth2redirect")
+        }
+
+        create("ios") {
         }
     }
 }

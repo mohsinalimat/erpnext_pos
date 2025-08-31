@@ -20,9 +20,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        AppContext.init(this@MainActivity)
-
-        initKoin({ androidContext(this@MainActivity) }, listOf(androidModule))
         setContent {
             App()
         }
