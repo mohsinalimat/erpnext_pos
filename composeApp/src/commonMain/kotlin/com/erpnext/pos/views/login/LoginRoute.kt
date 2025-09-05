@@ -21,7 +21,12 @@ fun LoginRoute(
 fun rememberLoginActions(coordinator: LoginCoordinator): LoginAction {
     return remember(coordinator) {
         LoginAction(
-            onLogin = coordinator::doLogin
+            existingSites = coordinator::existingSites,
+            onSiteSelected = coordinator::onSiteSelected,
+            onAddSite = coordinator::onAddSite,
+            onError = coordinator::onError,
+            onReset = coordinator::onReset,
+            isAuthenticated = coordinator::isAuthenticated
         )
     }
 }

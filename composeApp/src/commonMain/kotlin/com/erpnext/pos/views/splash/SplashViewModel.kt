@@ -21,15 +21,13 @@ class SplashViewModel(
     val stateFlow: StateFlow<SplashState> = _stateFlow.asStateFlow()
 
     fun verifyToken() {
-        viewModelScope.launch {
-            _stateFlow.update { SplashState.Loading }
-            val tokens = tokenStore.load()
-            tokens.let { token ->
-                if (TokenUtils.isValid(token?.id_token))
-                    navigationManager.navigateTo(NavRoute.Home)
-                else navigationManager.navigateTo(NavRoute.Login)
-                _stateFlow.update { SplashState.Success }
-            }
+        _stateFlow.update { SplashState.Loading }
+        val tokens = tokenStore.load()
+        tokens.let { token ->
+            if (TokenUtils.isValid(token?.id_token))
+                navigationManager.navigateTo(NavRoute.Home)
+            else navigationManager.navigateTo(NavRoute.Login)
+            _stateFlow.update { SplashState.Success }
         }
     }
 }

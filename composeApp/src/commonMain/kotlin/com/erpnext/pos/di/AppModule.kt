@@ -53,7 +53,7 @@ val appModule = module {
     single { LoginRemoteSource(get()) }
     single { LoginRepositories(get()) }
     single { LoginUseCase(get()) }
-    single { LoginViewModel(get(), get(), get()) }
+    single { LoginViewModel(get(), get(), get(), get(), get()) }
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.IO) }
     single { NavigationManager(get()) }
     single { SplashViewModel(get(), get()) }

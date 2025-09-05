@@ -4,7 +4,21 @@ import com.erpnext.pos.randomUrlSafe
 
 data class AuthRequest(val url: String, val state: String, val pkce: Pkce)
 
-fun buildAuthorizeRequest(cfg: OAuthConfig, scopeOverride: List<String>? = null): AuthRequest {
+suspend fun buildOAuthConfig(authInfoStore: AuthInfoStore): OAuthConfig {
+    val authInfo = authInfoStore.loadAuthInfo()
+    return OAuthConfig(
+        baseUrl = authInfo.url,
+        clientId = authInfo.clientId,
+        clientSecret = authInfo.clientSecret,
+        redirectUrl = authInfo.redirectUrl,
+        scopes = listOf("all", "openid")
+    )
+}
+
+suspend fun buildAuthorizeRequest(
+    cfg: OAuthConfig,
+    scopeOverride: List<String>? = null
+): AuthRequest {
     val pkce = PkceFactory.s256()
     val state = randomUrlSafe(32)
     val query = listOf(

@@ -1,16 +1,31 @@
 package com.erpnext.pos.remoteSource.oauth
 
+import com.erpnext.pos.remoteSource.dto.LoginInfo
 import com.erpnext.pos.remoteSource.dto.TokenResponse
+import com.erpnext.pos.views.login.Site
 import io.ktor.client.plugins.auth.providers.*
 import kotlinx.coroutines.flow.Flow
 
 interface TokenStore {
-    suspend fun load(): TokenResponse?
+    fun load(): TokenResponse?
     suspend fun save(tokens: TokenResponse)
     suspend fun clear()
 
     // Observable para UI/Logic
     fun tokensFlow(): Flow<TokenResponse?>
+}
+
+interface AuthInfoStore {
+    suspend fun loadAuthInfo(): LoginInfo
+    suspend fun saveAuthInfo(info: LoginInfo)
+    suspend fun clear()
+}
+
+interface SiteStore {
+    fun loadSites(): List<Site>?
+
+    suspend fun saveSite(site: Site)
+    suspend fun clearSite(url: String)
 }
 
 /**

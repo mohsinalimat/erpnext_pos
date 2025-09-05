@@ -1,5 +1,8 @@
 package com.erpnext.pos.remoteSource.api
 
+import com.erpnext.pos.BuildKonfig
+import com.erpnext.pos.remoteSource.dto.ItemDto
+import com.erpnext.pos.remoteSource.dto.LoginInfo
 import com.erpnext.pos.remoteSource.dto.TokenResponse
 import com.erpnext.pos.remoteSource.oauth.OAuthConfig
 import com.erpnext.pos.remoteSource.oauth.Pkce
@@ -14,7 +17,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 
 class APIService(
-    private val client: HttpClient,
+    private client: HttpClient,
     private val oauthConfig: OAuthConfig,
     private val store: TokenStore
 ) {
@@ -56,22 +59,28 @@ class APIService(
         expectedState: String,
         returnedState: String
     ): TokenResponse {
-        require(expectedState == returnedState) { "CSRF state mismatch" }
-        val res = clientOAuth.post(oauthConfig.tokenUrl) {
-            contentType(ContentType.Application.FormUrlEncoded)
-            setBody(Parameters.build {
-                append("grant_type", "authorization_code")
-                append("code", code)
-                append("redirect_uri", oauthConfig.redirectUrl)
-                append("client_id", oauthConfig.clientId)
-                append("code_verifier", pkce.verifier)
-                // Si usas cliente confidencial (no PKCE en mobile), añade client_secret:
-                oauthConfig.clientSecret?.let { append("client_secret", it) }
-            }.formUrlEncode())
-        }.body<TokenResponse>()
+        try {
+            require(expectedState == returnedState) { "CSRF state mismatch" }
+            val res = clientOAuth.post(oauthConfig.tokenUrl) {
+                contentType(ContentType.Application.FormUrlEncoded)
+                setBody(Parameters.build {
+                    append("grant_type", "authorization_code")
+                    append("code", code)
+                    append("redirect_uri", oauthConfig.redirectUrl)
+                    append("client_id", oauthConfig.clientId)
+                    append("code_verifier", pkce.verifier)
+                    // Si usas cliente confidencial (no PKCE en mobile), añade client_secret:
+                    oauthConfig.clientSecret?.let { append("client_secret", it) }
+                }.formUrlEncode())
+            }.body<TokenResponse>()
 
-        store.save(res)
-        return res
+            store.save(res)
+            return res
+        } catch (e: Exception) {
+            e.message
+            return TokenResponse("", "", 0, "", "")
+        }
+
     }
 
     suspend fun refreshToken(refresh: String): TokenResponse {
@@ -92,6 +101,24 @@ class APIService(
             setBody("token=$accessToken")
         }
         store.clear()
+    }
+
+    suspend fun items(): List<ItemDto> {
+        return clientOAuth.get(Endpoints.Items.url) {
+            contentType(ContentType.Application.Json)
+        }.body<List<ItemDto>>()
+    }
+
+    //TODO: Cuando tenga el API lo cambiamos
+    suspend fun getLoginWithSite(site: String): LoginInfo {
+        return LoginInfo(
+            BuildKonfig.BASE_URL, BuildKonfig.REDIRECT_URI,
+            BuildKonfig.CLIENT_ID, BuildKonfig.CLIENT_SECRET, listOf("all", "openid")
+        )
+        /*return  clientOAuth.get("") {
+             contentType(ContentType.Application.Json)
+             setBody(site)
+         }.body()*/
     }
 }
 

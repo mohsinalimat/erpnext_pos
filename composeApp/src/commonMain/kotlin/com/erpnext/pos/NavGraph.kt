@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.erpnext.pos.navigation.NavRoute
 import com.erpnext.pos.views.HomeScreen
-import com.erpnext.pos.views.InventoryScreen
+import com.erpnext.pos.views.inventory.InventoryScreen
 import com.erpnext.pos.views.InvoiceListScreen
 import com.erpnext.pos.views.customer.CustomerDetailScreen
 import com.erpnext.pos.views.customer.CustomerListScreen

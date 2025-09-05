@@ -1,4 +1,4 @@
-package com.erpnext.pos.views
+package com.erpnext.pos.views.inventory
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

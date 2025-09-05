@@ -24,12 +24,10 @@ fun SplashScreen(
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            delay(1500)
             actions.isAuth()
         }
     }
 
-    // Muestra un indicador de carga mientras se verifica
     if (state == SplashState.Loading) {
         Box(
             modifier = Modifier.fillMaxSize(),
