@@ -22,6 +22,7 @@ fun rememberInventoryActions(coordinator: InventoryCoordinator): InventoryAction
     return remember(coordinator) {
         InventoryAction(
             fetchAll = coordinator::fetchInventory,
+            print = coordinator::print,
             getDetails = coordinator::getItemDetails,
             refresh = coordinator::refresh,
             onError = coordinator::onError

@@ -98,7 +98,7 @@ fun InventoryScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* Acción imprimir */ }) {
+            FloatingActionButton(onClick = { actions.print() }) {
                 Icon(Icons.Default.Print, contentDescription = "Imprimir")
             }
         }
@@ -125,13 +125,9 @@ fun InventoryScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             // Barra de búsqueda
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = { Text("Buscar") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
+            SearchTextField(
+                searchQuery, { searchQuery = it },
+                onSearchAction = {})
 
             Spacer(modifier = Modifier.height(12.dp))
 

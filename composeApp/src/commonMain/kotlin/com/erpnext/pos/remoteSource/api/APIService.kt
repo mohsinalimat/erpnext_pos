@@ -1,6 +1,7 @@
 package com.erpnext.pos.remoteSource.api
 
 import com.erpnext.pos.BuildKonfig
+import com.erpnext.pos.remoteSource.dto.CategoryDto
 import com.erpnext.pos.remoteSource.dto.ItemDto
 import com.erpnext.pos.remoteSource.dto.LoginInfo
 import com.erpnext.pos.remoteSource.dto.TokenResponse
@@ -121,7 +122,28 @@ class APIService(
             fields = ERPDocType.Item.getFields(),
             filters = filters {
                 eq("disabled", false)
-            }, orderBy = "item_name", baseUrl = url ?: ""
+            }, orderBy = "item_name", baseUrl = url
+        )
+    }
+
+    suspend fun getCategories(): List<CategoryDto> {
+        val url = authStore.getCurrentSite()
+        return clientOAuth.getERPList(
+            ERPDocType.Category.path,
+            ERPDocType.Category.getFields(),
+            orderBy = "name", baseUrl = url
+        )
+    }
+
+    suspend fun getItemDetail(itemId: String): ItemDto {
+        val url = authStore.getCurrentSite()
+        if (url.isNullOrEmpty())
+            throw Exception("URL Invalida")
+
+        return clientOAuth.getERPSingle(
+            doctype = ERPDocType.Item.path,
+            name = itemId,
+            baseUrl = url
         )
     }
 

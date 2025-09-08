@@ -1,6 +1,8 @@
 package com.erpnext.pos.views.inventory
 
 import com.erpnext.pos.base.BaseViewModel
+import com.erpnext.pos.domain.usecases.FetchCategoriesUseCase
+import com.erpnext.pos.domain.usecases.FetchInventoryItemUseCase
 import com.erpnext.pos.navigation.NavigationManager
 import com.erpnext.pos.remoteSource.api.APIService
 import com.erpnext.pos.remoteSource.dto.ItemDto
@@ -9,6 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class InventoryViewModel(
     private val navManager: NavigationManager,
+    private val fetchCategoryUseCase: FetchCategoriesUseCase,
+    private val fetchInventoryItemUseCase: FetchInventoryItemUseCase,
 ) : BaseViewModel() {
 
     private val _stateFlow: MutableStateFlow<InventoryState> =

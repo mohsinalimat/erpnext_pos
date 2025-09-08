@@ -1,6 +1,7 @@
 package com.erpnext.pos.remoteSource.api
 
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.json.Json
@@ -41,7 +42,7 @@ suspend inline fun <reified T> HttpClient.getERPList(
 
         val url = "$baseUrl/api/resource/$doctype?${params.joinToString("&")}"
 
-        val response: HttpResponse = this.get(url)
+        val response: HttpResponse = this.get(url).body()
         val json = Json.parseToJsonElement(response.bodyAsText()).jsonObject
         return Json.decodeFromString(json["data"].toString())
     } else {

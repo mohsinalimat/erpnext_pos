@@ -11,6 +11,7 @@ sealed class InventoryState {
 
 data class InventoryAction(
     val fetchAll: () -> List<ItemDto>? = { emptyList() },
+    val print: () -> Unit = {},
     val getDetails: (String) -> ItemDto? = { null },
     val refresh: () -> Unit = {},
     val onError: (error: String) -> Unit = {}

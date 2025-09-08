@@ -92,7 +92,13 @@ class AndroidTokenStore(private val context: Context) : TokenStore, TransientAut
     }
 
     override suspend fun clear() {
-        prefs.edit { clear() }
+        prefs.edit {
+            remove("access_token")
+            remove("refresh_token")
+            remove("id_token")
+            remove("expires_in")
+            apply()
+        }
         stateFlow.update { null }
     }
 
@@ -116,26 +122,4 @@ class AndroidTokenStore(private val context: Context) : TokenStore, TransientAut
     override suspend fun clearState() {
         prefs.edit { remove("oauth_state") }
     }
-
-    // Site Store
-    /*override fun loadSites(): MutableList<Site>? {
-        val sites = prefs.getString("sites", null) ?: return mutableListOf<Site>()
-        return json.decodeFromString(sites)
-    }
-
-    override suspend fun saveSite(site: Site) {
-        val list = loadSites()
-        list?.add(site)
-        val serialized = json.encodeToString(list)
-        prefs.edit().apply {
-            putString("sites", serialized)
-            apply()
-        }
-    }
-
-    override suspend fun clearSite(url: String) {
-        val sites = loadSites() ?: emptyList()
-        val updated = sites.filter { it.url != url }
-        updated.forEach { saveSite(it) }
-    }*/
 }

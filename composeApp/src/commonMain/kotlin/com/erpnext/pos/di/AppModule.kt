@@ -1,14 +1,13 @@
 package com.erpnext.pos.di
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import com.erpnext.pos.BuildKonfig
 import com.erpnext.pos.data.repositories.InventoryRepository
+import com.erpnext.pos.domain.repositories.IInventoryRepository
 import com.erpnext.pos.domain.usecases.FetchInventoryItemUseCase
 import com.erpnext.pos.navigation.NavigationManager
 import com.erpnext.pos.remoteSource.api.APIService
 import com.erpnext.pos.remoteSource.api.defaultEngine
 import com.erpnext.pos.remoteSource.datasources.InventoryRemoteSource
-import com.erpnext.pos.remoteSource.oauth.OAuthConfig
 import com.erpnext.pos.views.inventory.InventoryViewModel
 import com.erpnext.pos.views.login.LoginViewModel
 import com.erpnext.pos.views.splash.SplashViewModel
@@ -27,6 +26,7 @@ import org.koin.dsl.module
 
 val appModule = module {
 
+    //region Core DI
     single {
         HttpClient(defaultEngine()) {
             install(ContentNegotiation) { json() }
@@ -36,26 +36,38 @@ val appModule = module {
 
     single {
         APIService(
-            client = get(),
-            authStore = get(),
-            store = get()
+            client = get(), authStore = get(), store = get()
         )
     }
 
-    single { InventoryRemoteSource(get(), get()) }
-    single { InventoryRepository(get()) }
-    single { FetchInventoryItemUseCase(get()) }
-    single { LoginViewModel(get(), get(), get(), get()) }
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.IO) }
     single { NavigationManager(get()) }
-    single { SplashViewModel(get(), get()) }
     single {
         PreferenceDataStoreFactory.createWithPath {
             "./prefs.preferences_pb".toPath()
         }
     }
+    //endregion
 
-    single { InventoryViewModel(get()) }
+    //region Login DI
+    single { LoginViewModel(get(), get(), get(), get()) }
+    //endregion
+
+    //region Splash DI
+    single { SplashViewModel(get(), get()) }
+    //endregion
+
+    //region UseCases DI
+    single { FetchInventoryItemUseCase(get()) }
+    single { FetchInventoryItemUseCase(get()) }
+    //endregion
+
+
+    //region Inventory DI
+    single { InventoryRemoteSource(get(), get()) }
+    single<IInventoryRepository> { InventoryRepository(get()) }
+    single { InventoryViewModel(get(), get(), get()) }
+    //endregion
 }
 
 fun initKoin(config: KoinAppDeclaration? = null, modules: List<Module> = listOf()) {

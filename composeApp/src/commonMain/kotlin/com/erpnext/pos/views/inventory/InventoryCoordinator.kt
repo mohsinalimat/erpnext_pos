@@ -14,6 +14,8 @@ class InventoryCoordinator(
         return viewModel.fetchAllItems()
     }
 
+    fun print() {}
+
     fun getItemDetails(itemId: String): ItemDto? {
         return viewModel.getItemDetail(itemId)
     }

@@ -1,7 +1,9 @@
 package com.erpnext.pos.data.mappers
 
+import com.erpnext.pos.domain.models.CategoryBO
 import com.erpnext.pos.domain.models.ItemBO
 import com.erpnext.pos.domain.models.UserBO
+import com.erpnext.pos.remoteSource.dto.CategoryDto
 import com.erpnext.pos.remoteSource.dto.ItemDto
 import com.erpnext.pos.remoteSource.dto.UserDto
 
@@ -27,5 +29,15 @@ fun ItemDto.toBO(): ItemBO {
         isService = this.isService,
         isStocked = this.isStocked,
         description = this.description
+    )
+}
+
+fun List<CategoryDto>.toBO(): List<CategoryBO> {
+    return this.map { it.toBO() }
+}
+
+fun CategoryDto.toBO(): CategoryBO {
+    return CategoryBO(
+        name = this.name,
     )
 }
