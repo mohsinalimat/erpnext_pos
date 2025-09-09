@@ -35,8 +35,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao
 }
 
-// The Room compiler generates the `actual` implementations.
-@Suppress("NO_ACTUAL_FOR_EXPECT")
 expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
     override fun initialize(): AppDatabase
+}
+
+expect class DatabaseBuilder {
+    fun build(): AppDatabase
 }

@@ -1,13 +1,15 @@
 package com.erpnext.pos.views.inventory
 
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.erpnext.pos.base.BaseViewModel
 import com.erpnext.pos.domain.usecases.FetchCategoriesUseCase
 import com.erpnext.pos.domain.usecases.FetchInventoryItemUseCase
 import com.erpnext.pos.navigation.NavigationManager
-import com.erpnext.pos.remoteSource.api.APIService
 import com.erpnext.pos.remoteSource.dto.ItemDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class InventoryViewModel(
     private val navManager: NavigationManager,
@@ -19,15 +21,27 @@ class InventoryViewModel(
         MutableStateFlow(InventoryState.Loading)
     val stateFlow = _stateFlow.asStateFlow()
 
-    fun fetchAllItems(): List<ItemDto> {
-        return emptyList()
+    fun fetchAllItems() {
+        _stateFlow.update { InventoryState.Loading }
+        executeUseCase(
+            action = {
+                val items = fetchInventoryItemUseCase.invoke(null)
+                    .cachedIn(viewModelScope)
+                _stateFlow.update { InventoryState.Success(items) }
+            },
+            exceptionHandler = {
+                _stateFlow.update { state -> InventoryState.Error(it.message ?: "Error") }
+            }
+        )
     }
 
     fun getItemDetail(itemId: String): ItemDto? {
         return null
     }
 
-    fun refresh() {}
+    fun refresh() {
+        fetchAllItems()
+    }
 
     fun onError(message: String) {}
 }

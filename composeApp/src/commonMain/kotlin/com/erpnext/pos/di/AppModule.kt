@@ -1,8 +1,13 @@
 package com.erpnext.pos.di
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import com.erpnext.pos.data.AppDatabase
+import com.erpnext.pos.data.DatabaseBuilder
 import com.erpnext.pos.data.repositories.InventoryRepository
 import com.erpnext.pos.domain.repositories.IInventoryRepository
+import com.erpnext.pos.domain.usecases.FetchCategoriesUseCase
 import com.erpnext.pos.domain.usecases.FetchInventoryItemUseCase
 import com.erpnext.pos.navigation.NavigationManager
 import com.erpnext.pos.remoteSource.api.APIService
@@ -13,6 +18,7 @@ import com.erpnext.pos.views.login.LoginViewModel
 import com.erpnext.pos.views.splash.SplashViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.parametersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +27,7 @@ import kotlinx.coroutines.SupervisorJob
 import okio.Path.Companion.toPath
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
+import org.koin.core.parameter.parametersOf
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
@@ -30,7 +37,6 @@ val appModule = module {
     single {
         HttpClient(defaultEngine()) {
             install(ContentNegotiation) { json() }
-            expectSuccess = true
         }
     }
 
@@ -57,22 +63,26 @@ val appModule = module {
     single { SplashViewModel(get(), get()) }
     //endregion
 
-    //region UseCases DI
-    single { FetchInventoryItemUseCase(get()) }
-    single { FetchInventoryItemUseCase(get()) }
-    //endregion
-
-
     //region Inventory DI
     single { InventoryRemoteSource(get(), get()) }
     single<IInventoryRepository> { InventoryRepository(get()) }
     single { InventoryViewModel(get(), get(), get()) }
     //endregion
+
+    //region UseCases DI
+    single { FetchInventoryItemUseCase(get()) }
+    single { FetchCategoriesUseCase(get()) }
+    //endregion
 }
 
-fun initKoin(config: KoinAppDeclaration? = null, modules: List<Module> = listOf()) {
+fun initKoin(
+    config: KoinAppDeclaration? = null,
+    modules: List<Module> = listOf(),
+    builder: DatabaseBuilder
+) {
     startKoin {
         config?.invoke(this)
         modules(appModule + modules)
+        koin.get<AppDatabase> { parametersOf(builder) }
     }
 }

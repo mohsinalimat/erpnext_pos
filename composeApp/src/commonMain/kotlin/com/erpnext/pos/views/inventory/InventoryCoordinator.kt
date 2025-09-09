@@ -10,17 +10,23 @@ class InventoryCoordinator(
 ) {
     val screenStateFlow = viewModel.stateFlow
 
-    fun fetchInventory(): List<ItemDto>? {
-        return viewModel.fetchAllItems()
+    fun fetchInventory() {
+        viewModel.fetchAllItems()
     }
 
-    fun print() {}
+    fun onPrint() {}
 
-    fun getItemDetails(itemId: String): ItemDto? {
-        return viewModel.getItemDetail(itemId)
+    fun onSearchQueryChanged(input: String) {}
+
+    fun onClearSearch() {}
+
+    fun onCategorySelected(category: String) {}
+
+    fun getItemDetails(itemId: String) {
+        viewModel.getItemDetail(itemId)
     }
 
-    fun refresh() {
+    fun onRefresh() {
         viewModel.refresh()
     }
 

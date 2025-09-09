@@ -2,7 +2,6 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
-import com.codingfeline.buildkonfig.gradle.TargetConfigDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -14,6 +13,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidx.room)
     alias(libs.plugins.build.konfig)
+    alias(libs.plugins.sqlDelight)
 }
 
 kotlin {
@@ -35,12 +35,25 @@ kotlin {
         }
     }
 
+    sqldelight {
+        databases {
+            create("ERPNextPos") {
+                packageName = "com.erpnext.pos"
+            }
+        }
+    }
+
     jvm("desktop")
 
     sourceSets {
         val desktopMain by getting
 
         commonMain.dependencies {
+
+            implementation(libs.androidx.paging.common)
+            // Si usas UI Compose multiplataforma:
+            implementation(libs.androidx.paging.compose)
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -57,6 +70,9 @@ kotlin {
             implementation(libs.androidx.navigation.compose)
 
             implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.room.paging)
+            implementation("androidx.room:room-ktx:2.7.2")
+            // implementation(libs.androidx.room.ktx)
             implementation(libs.androidx.sqlite.bundled)
 
             implementation(libs.kotlinx.coroutines.core)
@@ -70,11 +86,13 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel)
+            implementation(libs.sqldelight.coroutines)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
         androidMain.dependencies {
+            implementation(libs.sqldelight.android)
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
 
@@ -85,14 +103,20 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.coroutines.android)
 
-            implementation("androidx.security:security-crypto:1.1.0")
+            implementation(libs.security.crypto)
+
+            implementation(libs.androidx.room.runtime)
+            //ksp(libs.androidx.room.compiler)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.sqldelight.jvm)
         }
         iosMain.dependencies {
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.sqldelight.native)
             implementation(libs.ktor.client.darwin)
         }
     }
@@ -116,10 +140,10 @@ buildkonfig {
 
     targetConfigs("staging") {
         create("android") {
-            buildConfigField(STRING, "BASE_URL", "https://erp-ni.distribuidorareyes.com")
-            buildConfigField(STRING, "CLIENT_ID", "7cg6tv3vov")
-            buildConfigField(STRING, "CLIENT_SECRET", "a3625ee5aa")
-            buildConfigField(STRING, "REDIRECT_URI", "org.erpnext.pos://oauth2redirect")
+            buildConfigField(STRING, "BASE_URL", "BASE_URL")
+            buildConfigField(STRING, "CLIENT_ID", "CLIENT_ID")
+            buildConfigField(STRING, "CLIENT_SECRET", "CLIENT_SECRET")
+            buildConfigField(STRING, "REDIRECT_URI", "REDIRECT_URI")
         }
 
         create("ios") {

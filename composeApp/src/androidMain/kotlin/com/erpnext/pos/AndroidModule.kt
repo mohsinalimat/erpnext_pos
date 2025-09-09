@@ -1,5 +1,7 @@
 package com.erpnext.pos
 
+import com.erpnext.pos.data.AppDatabase
+import com.erpnext.pos.data.DatabaseBuilder
 import com.erpnext.pos.navigation.AndroidAuthNavigator
 import com.erpnext.pos.navigation.AuthNavigator
 import com.erpnext.pos.remoteSource.oauth.AuthInfoStore
@@ -12,4 +14,6 @@ val androidModule = module {
     single<AuthInfoStore> { get<TokenStore>() as AndroidTokenStore }
     single<TransientAuthStore> { get<TokenStore>() as AndroidTokenStore }
     single<AuthNavigator> { AndroidAuthNavigator() }
+    single { (builder: DatabaseBuilder) -> builder.build() }
+    single { get<AppDatabase>().itemDao() }
 }

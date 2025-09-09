@@ -6,6 +6,11 @@ import com.erpnext.pos.views.login.Site
 import io.ktor.client.plugins.auth.providers.*
 import kotlinx.coroutines.flow.Flow
 
+fun TokenResponse?.toBearerToken(): BearerTokens? {
+    if (this == null) return null
+    return BearerTokens(this.access_token, this.refresh_token)
+}
+
 interface TokenStore {
     fun load(): TokenResponse?
     suspend fun save(tokens: TokenResponse)

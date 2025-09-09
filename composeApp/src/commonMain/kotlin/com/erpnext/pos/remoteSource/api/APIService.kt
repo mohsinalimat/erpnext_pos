@@ -10,6 +10,7 @@ import com.erpnext.pos.remoteSource.oauth.OAuthConfig
 import com.erpnext.pos.remoteSource.oauth.Pkce
 import com.erpnext.pos.remoteSource.oauth.TokenStore
 import com.erpnext.pos.remoteSource.oauth.buildAuthorizeRequest
+import com.erpnext.pos.remoteSource.oauth.toBearerToken
 import com.erpnext.pos.remoteSource.oauth.toOAuthConfig
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -30,10 +31,7 @@ class APIService(
             install(Auth) {
                 bearer {
                     loadTokens {
-                        val token = store.load()
-                        if (token != null)
-                            BearerTokens(token.access_token, token.refresh_token)
-                        null
+                        store.load()?.toBearerToken()
                     }
                     refreshTokens {
                         val current = store.load() ?: return@refreshTokens null
@@ -112,7 +110,7 @@ class APIService(
     }
 
     //TODO: Para los fields podriamos hacer un diccionario por cada DocType con los fields necesarios
-    suspend fun items(): List<ItemDto> {
+    suspend fun items(offset: Int): List<ItemDto> {
         val url = authStore.getCurrentSite()
         if (url.isNullOrEmpty())
             throw Exception("URL Invalida")
@@ -122,7 +120,10 @@ class APIService(
             fields = ERPDocType.Item.getFields(),
             filters = filters {
                 eq("disabled", false)
-            }, orderBy = "item_name", baseUrl = url
+            },
+            orderBy = "item_name", baseUrl = url,
+            limit = 15,
+            offset = offset
         )
     }
 

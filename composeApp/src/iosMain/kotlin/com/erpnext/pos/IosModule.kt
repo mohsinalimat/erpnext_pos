@@ -8,5 +8,6 @@ import org.koin.dsl.module
 val iosModule = module {
     single<TokenStore> { IosTokenStore() }
     single<TransientAuthStore> { get<TokenStore>() as IosTokenStore }
-    single<AuthNavigator> { IosAuthNavigator() }
+
+    // single<AuthNavigator> { IosAuthNavigator() }
 }
